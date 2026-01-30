@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>八年之约·致臻邀请</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@300;600&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-red: #9e1a1a; /* 胭脂红 */
+            --card-paper: #f0ebe5; /* 暖灰纸 */
+            --gold: #d4af37;
+            --gold-light: #f3e5ab;
+            --text-dark: #2c2c2c;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            font-family: 'Noto Serif SC', serif;
+            overflow: hidden;
+            perspective: 1800px;
+        }
+
+        /* 噪点纹理覆盖 - 增加质感 */
+        .noise-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none; z-index: 9999;
+        }
+
+        /* 主容器 */
+        .card-container {
+            position: relative;
+            width: 86vw;
+            max-width: 350px;
+            height: 78vh;
+            max-height: 660px;
+            transform-style: preserve-3d;
+            transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+            cursor: pointer;
+        }
+        
+        .card-container.open {
+            transform: translateX(15%) rotateY(-5deg); /* 微微倾斜更有3D感 */
+        }
+
+        /* 通用阴影 */
+        .shadow-soft { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
+
+        /* ==================== 封面 (Cover) ==================== */
+        .cover-page {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--card-red);
+            /* 细微的渐变光泽 */
+            background-image: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, transparent 40%, rgba(0,0,0,0.1) 100%);
+            border-radius: 4px;
+            z-index: 100;
+            transform-origin: left center;
+            transition: transform 1.2s cubic-bezier(0.645, 0.045, 0.355, 1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border-right: 1px solid rgba(0,0,0,0.2);
+        }
+
+        .card-container.open .cover-page {
+            transform: rotateY(-140deg);
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
+        }
+
+        /* 封面设计元素 */
+        
+        /* 1. 金色线条装饰 (Golden Circle Line) */
+        .circle-line {
+            position: absolute;
+            top: 15%; right: -20%;
+            width: 90%; padding-bottom: 90%; /* 保持圆形 */
+            border: 1px solid rgba(255, 236, 179, 0.3);
+            border-radius: 50%;
+        }
+        .circle-line::after {
+            content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px;
+            border: 1px solid rgba(255, 236, 179, 0.15); border-radius: 50%;
+        }
+
+        /* 2. 囍字 (印章风格) */
+        .xi-seal {
+            position: absolute;
+            top: 12vh;
+            right: 10vw;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: clamp(60px, 12vh, 80px);
+            color: var(--card-red);
+            background: var(--gold-light);
+            width: 1.4em; height: 1.4em;
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 4px;
+            box-shadow: 4px 4px 15px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        /* 囍字做旧纹理 */
+        .xi-seal::before {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background-image: radial-gradient(rgba(158, 26, 26, 0.2) 1px, transparent 1px);
+            background-size: 4px 4px; opacity: 0.5;
+        }
+
+        /* 3. 主标题 "请帖" (极致的大) */
+        .title-main {
+            position: absolute;
+            bottom: 10vh;
+            left: 8vw;
+            font-family: 'Zhi Mang Xing', cursive;
+            font-size: clamp(80px, 18vw, 120px);
+            line-height: 1;
+            color: rgba(255,255,255,0.1); /* 隐约的底纹感 */
+            writing-mode: vertical-rl;
+            pointer-events: none;
+        }
+        /* 叠加一层清晰的金色 */
+        .title-main-overlay {
+            position: absolute;
+            bottom: 12vh;
+            left: 10vw;
+            font-family: 'Ma Shan Zheng', cursive;
+            font-size: clamp(40px, 10vw, 60px);
+            color: var(--gold-light);
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            letter-spacing: 1vh;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+
+        /* 4. 八年文案 (极细字体，雅致) */
+        .side-text-col {
+            position: absolute;
+            top: 15vh;
+            left: 10vw;
+            height: 60%;
+            display: flex;
+            align-items: center;
+            z-index: 5;
+        }
+        .side-text {
+            writing-mode: vertical-rl;
+            text-orientation: upright;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 300; /* 细体 */
+            font-size: clamp(14px, 3.5vw, 16px);
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.8em;
+            white-space: nowrap;
+            border-left: 1px solid rgba(255,255,255,0.3);
+            padding-left: 12px;
+        }
+        
+        .hint {
+            position: absolute; bottom: 3vh; width: 100%; text-align: center;
+            font-size: 10px; letter-spacing: 4px; color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+        }
+
+        /* ==================== 内页 (Inside) ==================== */
+        .inside-page {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: var(--card-paper);
+            border-radius: 4px;
+            padding: 20px;
+            display: flex; flex-direction: column;
+            color: var(--text-dark);
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.05); /* 纸张内凹感 */
+        }
+
+        /* 内页边框 - 双线风格 */
+        .inner-frame {
+            border: 3px double var(--card-red);
+            height: 100%; width: 100%;
+            padding: 20px 15px;
+            display: flex; flex-direction: column; align-items: center;
+            position: relative;
+        }
+        
+        /* 装饰角 */
+        .corner-deco {
+            position: absolute; width: 20px; height: 20px;
+            border: 2px solid var(--card-red); transition: all 0.3s;
+        }
+        .c-tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+        .c-tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+        .c-bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+        .c-br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+        .header-xi {
+            font-family: 'Ma Shan Zheng'; font-size: 24px; color: var(--card-red); margin-bottom: 2vh;
+            opacity: 0.8; letter-spacing: 2px;
+        }
+
+        .main-message {
+            font-family: 'Zhi Mang Xing', cursive;
+            font-size: clamp(28px, 8vw, 36px);
+            color: #2c2c2c;
+            line-height: 1.3;
+            text-align: center;
+            margin-bottom: 3vh;
+        }
+
+        .content-block {
+            width: 100%;
+            text-align: center;
+            font-size: clamp(15px, 4vw, 17px);
+            line-height: 1.8;
+            font-weight: 600;
+            margin-bottom: 3vh;
+            color: #555;
+        }
+        
+        /* Steam 风格化 */
+        .steam-text {
+            display: inline-block;
+            border-bottom: 2px solid #171a21;
+            color: #171a21;
+            font-weight: 900;
+            font-family: sans-serif;
+            padding: 0 4px;
+        }
+
+        /* 信息票据卡 */
+        .ticket-info {
+            background: #fff;
+            width: 100%;
+            border: 1px dashed #ccc;
+            padding: 15px;
+            border-radius: 4px;
+            position: relative;
+        }
+        /* 票据左右的半圆缺口 */
+        .ticket-info::before, .ticket-info::after {
+            content: ''; position: absolute; top: 50%; width: 12px; height: 12px;
+            background: var(--card-paper); border-radius: 50%; transform: translateY(-50%);
+        }
+        .ticket-info::before { left: -6px; border-right: 1px solid #ccc; }
+        .ticket-info::after { right: -6px; border-left: 1px solid #ccc; }
+
+        .info-row {
+            display: flex; margin-bottom: 8px; font-size: 14px; text-align: left;
+        }
+        .label { color: var(--card-red); font-weight: bold; width: 3em; flex-shrink: 0; }
+        .val { color: #333; }
+
+        .footer-stamp {
+            margin-top: auto;
+            width: 80px; height: 80px;
+            border: 2px solid var(--card-red);
+            color: var(--card-red);
+            display: flex; justify-content: center; align-items: center;
+            border-radius: 4px;
+            font-family: 'Ma Shan Zheng';
+            font-size: 18px;
+            transform: rotate(-8deg);
+            opacity: 0.6;
+            mix-blend-mode: multiply;
+        }
+        
+    </style>
+</head>
+<body>
+
+    <!-- 噪点层 -->
+    <div class="noise-overlay"></div>
+
+    <div class="card-container shadow-soft" id="card" onclick="flipCard()">
+        
+        <!-- 封面：胭脂红 + 几何线条 -->
+        <div class="cover-page">
+            <!-- 装饰圆环 -->
+            <div class="circle-line"></div>
+
+            <!-- 印章风格的囍 -->
+            <div class="xi-seal">囍</div>
+
+            <!-- 左侧：竖排八年文案 (极细分割线风格) -->
+            <div class="side-text-col">
+                <div class="side-text">在一起八年啦！</div>
+            </div>
+
+            <!-- 主标题：双层叠加制造立体感 -->
+            <div class="title-main">请帖</div> <!-- 巨大背景字 -->
+            <div class="title-main-overlay">请帖</div> <!-- 前景金字 -->
+
+            <div class="hint">TAP TO OPEN</div>
+        </div>
+
+        <!-- 内页：复古票据风 -->
+        <div class="inside-page">
+            <div class="inner-frame">
+                <div class="corner-deco c-tl"></div>
+                <div class="corner-deco c-tr"></div>
+                <div class="corner-deco c-bl"></div>
+                <div class="corner-deco c-br"></div>
+
+                <div class="header-xi">💝 囍事将近 💝</div>
+                
+                <div class="main-message">
+                    良辰已定<br>
+                    <span style="font-size:0.6em; color:#666; font-family:'Noto Serif SC'">—— 邀君共赏 ——</span>
+                </div>
+
+                <div class="content-block">
+                    <p>敬备 <span class="steam-text">张小狗、王玉米、奶奶酱</span></p>
+                    <p>诚邀您出席一起打游戏</p>
+                </div>
+
+                <!-- 票据样式的信息栏 -->
+                <div class="ticket-info">
+                    <div class="info-row">
+                        <span class="label">时间</span>
+                        <div class="val">
+                            2026.01.30 (周五)<br>
+                            <span style="font-size:12px; color:#999">乙巳年 腊月十二 19:00</span>
+                        </div>
+                    </div>
+                    <div class="info-row" style="margin-bottom:0">
+                        <span class="label">地点</span>
+                        <div class="val">
+                            微信语音<br>
+                            <span style="font-size:12px; color:#999">ID: 不见不散</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-stamp">
+                    八年<br>之约
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function flipCard() {
+            const card = document.getElementById('card');
+            card.classList.toggle('open');
+            
+            // 简单的触觉反馈 (如果设备支持)
+            if(navigator.vibrate) navigator.vibrate(15);
+        }
+    </script>
+</body>
+</html>
