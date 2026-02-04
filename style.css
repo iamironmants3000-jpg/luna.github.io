@@ -8792,3 +8792,16 @@ body.minimal-chat-ui-active.chat-actions-expanded #chat-interface-screen #chat-m
     background: none !important;
     white-space: normal !important; /* 允许卡片正常换行和布局 */
 }
+@supports (padding-top: env(safe-area-inset-top)) {
+    #chat-room-header-default {
+        padding-top: max(20px, env(safe-area-inset-top)) !important;
+        height: auto !important;
+        min-height: 50px !important;
+        max-height: none !important;
+        align-items: center !important;
+    }
+
+    .typing-indicator {
+        top: calc(max(20px, env(safe-area-inset-top)) + 30px) !important;
+    }
+}
